@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Css.css">
+    <title>Test radio player</title>
+    <script src="https://kit.fontawesome.com/057c9e4c7c.js" crossorigin="anonymous"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+    <div class="top-panel"> 
+        <div class="main-page">
+            <a href="Radiosite.html">Головна</a>
+        </div>
+        <div class="controls">
+            <div><i onclick="toggleVideo()" class="fa-solid fa-play" id="ctrlIcon"></i></div>
+            <input 
+                min="0" 
+                max="100" 
+                step="0.1" 
+                type="range"  
+                value="100" 
+                id="progress" 
+                oninput="changeVolume(this.value)"
+            >
+        </div>
+    </div>
+
+    <div id="dynamic-content">
+        <div class="time-table_container">
+            <p>Графік ефірів</p>
+            <div class="time-table">14.02 Середа Тестовий івент</div>
+            <div class="time-table">14.02 Середа Тестовий івент</div>
+            <div class="time-table">14.02 Середа Тестовий івент</div>
+        </div>
+
+        <section class="img-container">
+            <div class="container">
+                <div class="music-player">
+                    <h1>Test radio player</h1>
+                    <img src="/images/testimg.png" class="song-img">
+                </div>
+            </div>
+        </section>
+
+        <div class="empty-space"></div>
+
+        <div class="news-content">
+            <h2>Новини радіо</h2>
+            <div class="news-item">
+                <a href="Firstnews.html" class="news-link">
+                    <img src="/images/testimg.png" class="news-img">
+                    <br><br><p1>Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
+                    when an unknown printer took a galley...</p1>
+                </a>
+            </div>
+            <hr>
+            <div class="news-item">
+                <a href="Secondnews.html" class="news-link">
+                    <img src="/images/testimg.png" class="news-img">
+                    <br><br><p1>Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
+                    when an unknown printer took a galley...</p1>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="player-container">
+        <div id="player"></div>
+    </div>
+    <div class="empty-space"></div>
+
+    <script>
+        var videoId = 'HQtFR3mhzOY'; // 'HQtFR3mhzOY' 8q-RlD_NwKg
+        var player;
+        var ctrlIcon = document.getElementById("ctrlIcon");
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '0',
+                width: '0',
+                videoId: videoId,
+                events: {
+                    'onReady': onPlayerReady
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            var savedState = localStorage.getItem('playerState');
+            var savedVolume = localStorage.getItem('savedVolume');
+            if (savedState == YT.PlayerState.PLAYING) {
+                event.target.playVideo();
+                ctrlIcon.classList.add("fa-pause");
+                ctrlIcon.classList.remove("fa-play");
+            } else {
+                ctrlIcon.classList.add("fa-play");
+                ctrlIcon.classList.remove("fa-pause");
+            }
+            if (savedVolume !== null) {
+                player.setVolume(savedVolume);
+            }
+        }
+
+        function toggleVideo() {
+            if (player.getPlayerState() == YT.PlayerState.PLAYING) {
+                player.pauseVideo();
+                ctrlIcon.classList.remove("fa-pause");
+                ctrlIcon.classList.add("fa-play");
+                localStorage.setItem('playerState', YT.PlayerState.PAUSED);
+            } else {
+                player.playVideo();
+                ctrlIcon.classList.add("fa-pause");
+                ctrlIcon.classList.remove("fa-play");
+                localStorage.setItem('playerState', YT.PlayerState.PLAYING);
+            }
+        }
+
+        function changeVolume(volume) {
+            player.setVolume(volume);
+            localStorage.setItem('savedVolume', volume);
+        }
+
+        $(document).ready(function() {
+            $('a.nav-link').on('click', function(e) {
+                e.preventDefault(); 
+                var url = $(this).attr('href');
+                $.ajax({
+                    url: url,
+                    success: function(response) {
+                        $('#dynamic-content').html($(response).find('#dynamic-content').html());
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Ошибка загрузки страницы: ' + status + ', ' + error);
+                    }
+                });
+            });
+
+            if (typeof YT !== 'undefined' && YT && YT.Player) {
+                onYouTubeIframeAPIReady();
+            } else {
+                window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
+            }
+        });
+    </script>
+</body>
+</html>
