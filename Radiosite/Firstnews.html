@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Css.css">
+    <title>Test radio player</title>
+    <script src="https://kit.fontawesome.com/057c9e4c7c.js" crossorigin="anonymous"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+    <div class="top-panel"> 
+        <div class="main-page">
+            <a href="Radiosite.html">Головна</a>
+        </div>
+        <div class="controls">
+            <div><i onclick="toggleVideo()" class="fa-solid fa-play" id="ctrlIcon"></i></div>
+            <input 
+                min="0" 
+                max="100" 
+                step="0.1" 
+                type="range"  
+                value="100" 
+                id="progress" 
+                oninput="changeVolume(this.value)"
+            >
+        </div>
+    </div>
+
+    <div class="time-table_container">
+        <p>Графік ефірів</p>
+        <div class="time-table">14.02 Середа Тестовий івент</div>
+        <div class="time-table">14.02 Середа Тестовий івент</div>
+        <div class="time-table">14.02 Середа Тестовий івент</div>
+    </div>
+
+    <section class="img-container">
+        <div class="container">
+            <div class="music-player">
+                <h1>Test radio player</h1>
+                <img src="/images/testimg.png" class="song-img">
+            </div>
+        </div>
+    </section>
+
+    <div class="empty-space"></div>
+
+
+        <div class="news-content">
+            <h2>Новини радіо</h2>
+            <div class="news-text">
+                <img src="/images/testimg.png" class="news-img">
+                <br>
+                <br>
+                <p1>Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                    Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, 
+                    when an unknown printer took a galley of type and scrambled it to make a type specimen book. 
+                    It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
+                     It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages,
+                      and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p1>
+            </div>
+
+           
+
+        </div>
+
+
+        <div id="player"></div>
+
+        <div class="empty-space"></div>
+        
+
+        <script>
+            var videoId = 'HQtFR3mhzOY'; // 'HQtFR3mhzOY' 8q-RlD_NwKg
+            var player;
+            var ctrlIcon = document.getElementById("ctrlIcon");
+    
+            function onYouTubeIframeAPIReady() {
+                player = new YT.Player('player', {
+                    height: '0',
+                    width: '0',
+                    videoId: videoId,
+                    events: {
+                        'onReady': onPlayerReady
+                    }
+                });
+            }
+    
+            function onPlayerReady(event) {
+                var savedState = localStorage.getItem('playerState');
+                var savedVolume = localStorage.getItem('savedVolume');
+                if (savedState == YT.PlayerState.PLAYING) {
+                    event.target.playVideo();
+                }
+                if (savedVolume !== null) {
+                    player.setVolume(savedVolume);
+                }
+            }
+    
+            function toggleVideo() {
+                if (player.getPlayerState() == YT.PlayerState.PLAYING) {
+                    player.pauseVideo();
+                    ctrlIcon.classList.remove("fa-pause");
+                    ctrlIcon.classList.add("fa-play");
+                    localStorage.setItem('playerState', YT.PlayerState.PAUSED);
+                } else {
+                    player.playVideo();
+                    ctrlIcon.classList.add("fa-pause");
+                    ctrlIcon.classList.remove("fa-play");
+                    localStorage.setItem('playerState', YT.PlayerState.PLAYING);
+                }
+            }
+    
+            function changeVolume(volume) {
+                player.setVolume(volume);
+                localStorage.setItem('savedVolume', volume);
+            }
+    
+            $(document).ready(function() {
+                $('a.nav-link').on('click', function(e) {
+                    e.preventDefault(); // Prevent default action
+                    var url = $(this).attr('href');
+                    $.ajax({
+                        url: url,
+                        success: function(response) {
+                            $('.time-table_container, .img-container, .news-content').html($(response).find('.time-table_container, .img-container, .news-content').html());
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Ошибка загрузки страницы: ' + status + ', ' + error);
+                        }
+                    });
+                });
+            });
+    
+            window.onload = function() {
+                onYouTubeIframeAPIReady();
+            };
+        </script>
+
+</body>
+</html>
